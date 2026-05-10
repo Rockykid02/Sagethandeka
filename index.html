@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - Digital Dynamo Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-color: #00d2ff;
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1b 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 50px;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .branding {
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .creator {
+            font-size: 0.6rem;
+            opacity: 0.5;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-weight: 300;
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .orb-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 30px auto;
+        }
+
+        .orb {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            border-radius: 50%;
+            filter: blur(10px);
+            opacity: 0.6;
+            transition: all 0.5s ease;
+        }
+
+        .orb.listening {
+            animation: pulse 1.5s infinite;
+            filter: blur(5px);
+            opacity: 1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(0, 210, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); }
+        }
+
+        #status {
+            font-size: 0.9rem;
+            margin-top: 20px;
+            min-height: 1.2em;
+            color: #bdc3c7;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: var(--accent-color);
+            color: #0f0f1b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="branding">Digital Dynamo Lab</div>
+    <div class="creator">BY SAGE DICKSON</div>
+    <h1>NEXUS</h1>
+    
+    <div class="orb-container">
+        <div class="orb" id="orb"></div>
+    </div>
+
+    <div id="status">Click below to activate</div>
+    <button onclick="startNexus()">Initialize Nexus</button>
+</div>
+
+<script>
+    // ----- UI elements -----
+    const statusText = document.getElementById('status');
+    const orb = document.getElementById('orb');
+    
+    // ----- Speech setup -----
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    const synth = window.speechSynthesis;
+
+    recognition.continuous = false;
+    recognition.lang = 'en-US';
+
+    // Helper to speak text with a premium voice if available
+    function speak(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        
+        const voices = synth.getVoices();
+        // Try to find a higher‑quality voice
+        utterance.voice = voices.find(voice => voice.name.includes('Google')) || voices[0];
+        
+        synth.speak(utterance);
+    }
+
+    // Start listening
+    function startNexus() {
+        recognition.start();
+        statusText.innerText = "Nexus is listening...";
+        orb.classList.add('listening');
+    }
+
+    // ----- Asynchronous API helpers -----
+
+    // 1. Weather (Open‑Meteo, no API key)
+    async function getWeather() {
+        return new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                try {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                    const data = await res.json();
+                    const temp = data.current_weather.temperature;
+                    const code = data.current_weather.weathercode;
+                    const condition = mapWeatherCode(code);
+                    resolve(`It's currently ${temp}°C and ${condition} in your area.`);
+                } catch {
+                    resolve("I couldn't fetch the weather right now.");
+                }
+            }, () => {
+                resolve("I need location access to tell the weather.");
+            });
+        });
+    }
+
+    function mapWeatherCode(code) {
+        if (code <= 3) return "clear";
+        if (code <= 48) return "foggy";
+        if (code <= 57) return "drizzly";
+        if (code <= 67) return "rainy";
+        if (code <= 77) return "snowy";
+        if (code <= 82) return "showery";
+        if (code <= 86) return "snow flurries";
+        return "thundery";
+    }
+
+    // 2. News Headlines (via rss2json, free)
+    async function getTopNews() {
+        try {
+            const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/world/rss.xml');
+            const data = await res.json();
+            const first = data.items[0].title;
+            return `Here's the top world news: ${first}`;
+        } catch {
+            return "News feed unavailable right now.";
+        }
+    }
+
+    // 3. Wikipedia summary
+    async function getWikipediaSummary(topic) {
+        try {
+            const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
+            if (!res.ok) return `I couldn't find anything on ${topic}.`;
+            const data = await res.json();
+            return data.extract || "No summary available.";
+        } catch {
+            return "Wikipedia seems to be down.";
+        }
+    }
+
+    // 4. Random Joke (JokeAPI)
+    async function getJoke() {
+        try {
+            const res = await fetch('https://v2.jokeapi.dev/joke/Any?type=single');
+            const data = await res.json();
+            return data.joke || "Why did the AI cross the road? To get to the real world.";
+        } catch {
+            return "How many programmers does it take to change a light bulb? None, it's a hardware problem.";
+        }
+    }
+
+    // 5. Useless fact
+    async function getRandomFact() {
+        try {
+            const res = await fetch('https://uselessfacts.jsph.pl/random.json?language=en');
+            const data = await res.json();
+            return data.text;
+        } catch {
+            return "The first oranges weren't orange.";
+        }
+    }
+
+    // 6. Safe math (only basic operators)
+    function safeEval(expr) {
+        const sanitized = expr.replace(/[^0-9+\-*/(). ]/g, '');
+        if (!sanitized.trim()) return null;
+        try {
+            const result = new Function(`return (${sanitized})`)();
+            return result;
+        } catch {
+            return null;
+        }
+    }
+
+    // 7. Memory (localStorage)
+    function remember(key, value) {
+        localStorage.setItem(`nexus_${key}`, value);
+        speak(`I'll remember that your ${key} is ${value}.`);
+    }
+
+    function recall(key) {
+        const value = localStorage.getItem(`nexus_${key}`);
+        if (value) {
+            speak(`Your ${key} is ${value}.`);
+        } else {
+            speak(`I don't remember your ${key} yet.`);
+        }
+    }
+
+    // ----- Main command handler -----
+    async function handleCommand(cmd) {
+        // Identity & Creator
+        if (cmd.includes('who are you') || cmd.includes('name')) {
+            speak("I am Nexus, your intelligent assistant, created by Sage Dickson at Digital Dynamo Lab.");
+        } 
+        else if (cmd.includes('creator') || cmd.includes('who made you')) {
+            speak("I was developed by Sage Dickson at the Digital Dynamo Lab laboratory.");
+        }
+        
+        // Time
+        else if (cmd.includes('time')) {
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            speak(`The current time is ${time}.`);
+        }
+        
+        // Battery
+        else if (cmd.includes('battery')) {
+            const battery = await navigator.getBattery();
+            const level = Math.round(battery.level * 100);
+            speak(`Your system battery is currently at ${level} percent.`);
+        }
+
+        // Weather
+        else if (cmd.includes('weather')) {
+            statusText.innerText = "Checking the sky...";
+            const weatherText = await getWeather();
+            speak(weatherText);
+        }
+
+        // News
+        else if (cmd.includes('news') || cmd.includes('headline')) {
+            statusText.innerText = "Fetching headlines...";
+            const headline = await getTopNews();
+            speak(headline);
+        }
+
+        // Wikipedia / tell me about / what is
+        else if (cmd.includes('tell me about') || cmd.includes('what is') || cmd.includes("what's")) {
+            let topic = cmd.replace(/tell me about|what is|what's/gi, '').trim();
+            if (!topic) {
+                speak("What do you want me to look up?");
+                return;
+            }
+            statusText.innerText = `Researching ${topic}...`;
+            const summary = await getWikipediaSummary(topic);
+            // Keep it brief
+            speak(summary.substring(0, 250));
+        }
+
+        // Joke
+        else if (cmd.includes('joke') || cmd.includes('funny')) {
+            const joke = await getJoke();
+            speak(joke);
+        }
+
+        // Random fact
+        else if (cmd.includes('fact') || cmd.includes('useless fact')) {
+            const fact = await getRandomFact();
+            speak(fact);
+        }
+
+        // Calculator
+        else if (cmd.includes('calculate') || cmd.includes('plus') || cmd.includes('minus') || cmd.includes('times') || cmd.includes('divided by')) {
+            let mathString = cmd
+                .replace('calculate', '')
+                .replace(/plus/gi, '+')
+                .replace(/minus/gi, '-')
+                .replace(/times/gi, '*')
+                .replace(/divided by/gi, '/');
+            
+            const result = safeEval(mathString);
+            if (result !== null) {
+                speak(`The result is ${result}.`);
+            } else {
+                speak("I couldn't compute that calculation.");
+            }
+        }
+
+        // Memory: "remember my <key> is <value>"
+        else if (cmd.includes('remember my')) {
+            const match = cmd.match(/remember my (\w+) is (.+)/i);
+            if (match) {
+                remember(match[1], match[2].trim());
+            } else {
+                speak("Try saying: remember my name is John.");
+            }
+        }
+        // Memory: "what is my <key>"
+        else if (cmd.includes('what is my')) {
+            const key = cmd.match(/what is my (\w+)/i)?.[1];
+            if (key) recall(key);
+            else speak("What should I recall?");
+        }
+
+        // Open websites
+        else if (cmd.includes('open google')) {
+            speak("Opening Google.");
+            window.open('https://www.google.com', '_blank');
+        }
+        else if (cmd.includes('open youtube')) {
+            speak("Launching YouTube.");
+            window.open('https://www.youtube.com', '_blank');
+        }
+
+        // Fun: flip a coin
+        else if (cmd.includes('flip a coin') || cmd.includes('coin flip')) {
+            const flip = Math.random() < 0.5 ? "Heads." : "Tails.";
+            speak(flip);
+        }
+        // Fun: roll a dice
+        else if (cmd.includes('roll a die') || cmd.includes('roll a dice') || cmd.includes('roll dice')) {
+            const roll = Math.floor(Math.random() * 6) + 1;
+            speak(`It's a ${roll}.`);
+        }
+
+        // Default
+        else {
+            speak("I heard you say " + cmd + ". I am still learning, but Sage Dickson is working on my neural pathways.");
+        }
+    }
+
+    // ----- Speech recognition events -----
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        statusText.innerText = `"${transcript}"`;
+        orb.classList.remove('listening');
+        handleCommand(transcript);
+    };
+
+    recognition.onerror = (event) => {
+        orb.classList.remove('listening');
+        statusText.innerText = "Try clicking the button again.";
+        console.warn("Speech recognition error:", event.error);
+    };
+
+    recognition.onend = () => {
+        orb.classList.remove('listening');
+        // Button is re‑enabled automatically because we don't disable it in this version; but if you want to be safe, nothing needed.
+    };
+
+    // Preload voices (optional)
+    window.addEventListener('load', () => {
+        synth.getVoices(); // trigger voice list loading
+    });
+</script>
+
+</body>
+</html>
