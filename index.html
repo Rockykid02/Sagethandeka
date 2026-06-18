@@ -2,420 +2,1253 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS - Digital Dynamo Lab</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Thandeka Universe ✦ Sage & Thandeka</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Dancing+Script:wght@400;700&family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --accent-color: #00d2ff;
-            --glass-bg: rgba(255, 255, 255, 0.07);
-            --border: rgba(255, 255, 255, 0.15);
+            --deep-purple: #1a0b2e;
+            --neon-pink: #ff4d6d;
+            --gold: #ffd700;
+            --electric-blue: #00d4ff;
+            --deep-space: #0a0514;
+            --star-white: #f8f0ff;
+            --glass-bg: rgba(26, 11, 46, 0.45);
+            --glass-border: rgba(255, 215, 0, 0.25);
+            --text-glow: 0 0 20px rgba(255, 215, 0, 0.6);
+            --card-radius: 20px;
+            --font-display: 'Cinzel Decorative', cursive;
+            --font-romantic: 'Dancing Script', cursive;
+            --font-tech: 'Orbitron', sans-serif;
+            --font-body: 'Inter', sans-serif;
         }
-
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1b 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Inter', sans-serif;
-            color: white;
-            overflow: hidden;
-        }
-
-        .container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 50px;
-            width: 380px;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .branding {
-            font-size: 0.7rem;
-            letter-spacing: 4px;
-            color: var(--accent-color);
-            margin-bottom: 5px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .creator {
-            font-size: 0.6rem;
-            opacity: 0.5;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            font-weight: 300;
-            font-size: 3rem;
-            margin: 0;
-            letter-spacing: 2px;
-            color: #fff;
-        }
-
-        .orb-container {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            margin: 30px auto;
-        }
-
-        .orb {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
-            border-radius: 50%;
-            filter: blur(10px);
-            opacity: 0.6;
-            transition: all 0.5s ease;
-        }
-
-        .orb.listening {
-            animation: pulse 1.5s infinite;
-            filter: blur(5px);
-            opacity: 1;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.7); }
-            70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(0, 210, 255, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); }
-        }
-
-        #status {
-            font-size: 0.9rem;
-            margin-top: 20px;
-            min-height: 1.2em;
-            color: #bdc3c7;
-        }
-
-        button {
-            background: transparent;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            padding: 12px 30px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 30px;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            background: var(--accent-color);
-            color: #0f0f1b;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { width:100%; height:100%; overflow:hidden; font-family:var(--font-body); background:var(--deep-space); -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+        #bgCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+        #cursorTrailContainer { position:fixed; inset:0; pointer-events:none; z-index:9999; }
+        .cursor-heart { position:absolute; pointer-events:none; animation:cursorFade 0.9s ease-out forwards; font-size:16px; filter:drop-shadow(0 0 6px var(--neon-pink)); will-change:transform, opacity; }
+        @keyframes cursorFade { 0%{ opacity:1; transform:translate(0,0) scale(1); } 100%{ opacity:0; transform:translate(var(--drift-x), var(--drift-y)) scale(0.2); } }
+        #app-container { position:relative; width:100%; height:100vh; overflow:hidden; }
+        .section { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; z-index:2; opacity:0; pointer-events:none; transition:opacity 0.8s ease, transform 0.8s ease; transform:translateY(30px); overflow-y:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--gold) rgba(0,0,0,0.2); }
+        .section::-webkit-scrollbar { width:5px; }
+        .section::-webkit-scrollbar-track { background:rgba(0,0,0,0.2); }
+        .section::-webkit-scrollbar-thumb { background:var(--gold); border-radius:10px; }
+        .section.active { opacity:1; pointer-events:all; transform:translateY(0); }
+        .nav-btn { margin-top:1.5rem; padding:0.8rem 2rem; border:2px solid var(--gold); background:rgba(26,11,46,0.4); color:var(--gold); border-radius:50px; cursor:pointer; font-family:var(--font-tech); font-size:0.9rem; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); transition:0.3s; z-index:5; letter-spacing:0.05em; text-shadow:0 0 10px var(--gold); min-width:48px; min-height:48px; touch-action:manipulation; }
+        .nav-btn:hover { background:rgba(255,215,0,0.15); box-shadow:0 0 25px rgba(255,215,0,0.5); }
+        #gate-title { font-family:var(--font-display); font-size:clamp(2.5rem, 8vw, 5rem); color:var(--gold); text-shadow:0 0 40px var(--gold); animation:floatText 3s infinite; margin-bottom:0.5rem; }
+        @keyframes floatText { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-12px); } }
+        #gate-subtitle { font-family:var(--font-romantic); font-size:1.3rem; color:var(--electric-blue); margin-bottom:2rem; }
+        #center-star { width:clamp(80px,16vw,130px); height:clamp(80px,16vw,130px); background:radial-gradient(circle, #fffbe6, #f5d78c, #c8943e); border-radius:50%; cursor:pointer; box-shadow:0 0 60px 25px rgba(240,200,100,0.5); animation:starPulse 2s infinite; touch-action:manipulation; }
+        @keyframes starPulse { 0%,100%{ box-shadow:0 0 60px 25px rgba(240,200,100,0.5); } 50%{ box-shadow:0 0 90px 40px rgba(255,220,140,0.8); } }
+        #countdown-overlay { position:fixed; top:0; left:0; width:100%; height:100%; z-index:100; display:none; align-items:center; justify-content:center; background:rgba(5,5,20,0.85); flex-direction:column; }
+        #countdown-number { font-size:clamp(5rem,15vw,10rem); color:#ffe9b0; text-shadow:0 0 80px rgba(255,200,100,0.9); animation:countPulse 0.8s ease-out; }
+        @keyframes countPulse { 0%{ transform:scale(2); opacity:0; } 40%{ transform:scale(0.9); opacity:1; } 100%{ transform:scale(1); } }
+        #memories-container { display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; max-width:900px; margin-top:1rem; padding:1rem; }
+        .memory-star { width:48px; height:48px; min-width:44px; min-height:44px; background:radial-gradient(circle, #fffde4, #e8c97a, #a07530); border-radius:50%; cursor:pointer; transition:all 0.4s; box-shadow:0 0 18px 6px rgba(220,170,70,0.5); position:relative; display:flex; align-items:center; justify-content:center; touch-action:manipulation; }
+        .memory-star.expanded { width:160px; height:160px; box-shadow:0 0 50px 20px rgba(240,180,100,0.7); background:radial-gradient(circle, #fffef5, #f5d89c, #b88040); }
+        .memory-content { position:absolute; opacity:0; text-align:center; font-size:0.8rem; color:#3a1a0a; font-weight:bold; padding:0.5rem; transition:opacity 0.5s; pointer-events:none; }
+        .memory-star.expanded .memory-content { opacity:1; }
+        .memory-emoji { font-size:1.5rem; display:block; }
+        #constellationArea { position:relative; width:100%; height:400px; cursor:pointer; touch-action:manipulation; }
+        #constellationCanvas { width:100%; height:100%; }
+        .constellation-star-info { position:absolute; pointer-events:none; background:rgba(10,5,20,0.9); border:1px solid var(--gold); border-radius:12px; padding:12px; font-family:var(--font-romantic); color:white; opacity:0; transform:translate(-50%,-120%); transition:0.4s; max-width:220px; text-align:center; z-index:10; backdrop-filter:blur(10px); }
+        .constellation-star-info.visible { opacity:1; transform:translate(-50%,-130%); }
+        #envelope-wrapper { position:relative; width:clamp(260px,60vw,420px); height:clamp(200px,40vw,300px); transform-style:preserve-3d; animation:envelopeFloat 4s infinite; }
+        @keyframes envelopeFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-15px); } }
+        #envelope-body { width:100%; height:100%; background:linear-gradient(160deg, #f5e6d3, #e8d5b8, #c9a87c, #a07840); border-radius:8px; position:relative; box-shadow:0 20px 50px rgba(0,0,0,0.5); }
+        #envelope-flap { position:absolute; top:0; left:0; width:100%; height:55%; background:linear-gradient(170deg, #faf0e0, #e0c9a0, #b88550); clip-path:polygon(0 0, 50% 85%, 100% 0); border-radius:8px 8px 0 0; z-index:3; transform-origin:top center; transition:transform 0.8s; }
+        #envelope-flap.open { transform:rotateX(-175deg); }
+        #wax-seal { position:absolute; top:50%; left:50%; transform:translate(-50%,-30%); width:60px; height:60px; background:radial-gradient(circle, #e84040, #b02020, #6a0a0a); border-radius:50%; z-index:5; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; touch-action:manipulation; }
+        #wax-seal::after { content:'♡'; font-size:1.6rem; color:#fdd; }
+        #wax-seal.broken { animation:sealBreak 0.6s ease-out forwards; pointer-events:none; }
+        @keyframes sealBreak { 0%{ transform:translate(-50%,-30%) scale(1); opacity:1; } 100%{ transform:translate(-50%,-30%) scale(0); opacity:0; } }
+        #letter-panel { position:absolute; top:8%; left:5%; width:90%; height:75%; background:#fefaf4; border-radius:4px; z-index:1; padding:1.5rem; overflow-y:auto; display:none; box-shadow:inset 0 0 10px rgba(0,0,0,0.1); color:#3a2010; font-family:var(--font-romantic); font-size:0.9rem; line-height:1.6; -webkit-overflow-scrolling:touch; }
+        #letter-panel.visible { display:block; }
+        #loveMeterGauge { width:100%; max-width:400px; height:45px; background:rgba(0,0,0,0.5); border-radius:30px; overflow:hidden; border:2px solid var(--glass-border); margin:1rem auto; }
+        #loveMeterFill { height:100%; width:0%; background:linear-gradient(90deg, var(--electric-blue), var(--neon-pink), var(--gold)); border-radius:30px; box-shadow:0 0 25px rgba(255,77,109,0.7); transition:width 0.3s; }
+        #loveMeterBtn { font-family:var(--font-tech); padding:12px 28px; border-radius:50px; border:2px solid var(--neon-pink); background:rgba(255,77,109,0.15); color:white; cursor:pointer; backdrop-filter:blur(8px); transition:0.3s; min-width:48px; min-height:48px; touch-action:manipulation; }
+        #loveMeterBtn:disabled { opacity:0.5; pointer-events:none; }
+        #loveResult { color:var(--gold); font-size:1.5rem; margin-top:0.5rem; display:none; text-shadow:0 0 20px var(--gold); }
+        #heart-3d { position:relative; width:120px; height:105px; cursor:pointer; animation:heartBeat3D 1s infinite; margin-bottom:2rem; touch-action:manipulation; }
+        #heart-3d::before, #heart-3d::after { content:''; position:absolute; top:0; width:50%; height:80%; background:linear-gradient(#ff5e7a, #c0394b, #7a1520); border-radius:50% 50% 0 0; box-shadow:0 10px 30px rgba(200,40,60,0.5); }
+        #heart-3d::before { left:0; transform:rotate(-45deg); }
+        #heart-3d::after { right:0; transform:rotate(45deg); }
+        #heart-center { position:absolute; top:30%; left:15%; width:70%; height:50%; background:linear-gradient(#ff8095, #d94050); clip-path:polygon(50% 0%, 0% 100%, 100% 100%); border-radius:0 0 4px 4px; }
+        @keyframes heartBeat3D { 0%,100%{ transform:scale(1); } 14%{ transform:scale(1.08); } 28%{ transform:scale(1); } 42%{ transform:scale(1.06); } 56%{ transform:scale(1); } }
+        #catchGameArea { position:relative; width:100%; max-width:500px; height:350px; margin:0 auto; border-radius:20px; overflow:hidden; border:2px solid rgba(255,77,109,0.3); background:radial-gradient(ellipse at center, #2a0a3a 0%, #0a0514 80%); touch-action:none; user-select:none; -webkit-user-select:none; }
+        #catchCanvas { display:block; width:100%; height:100%; }
+        #game-score { position:absolute; top:12px; right:16px; font-family:var(--font-tech); color:var(--gold); font-size:1rem; z-index:10; pointer-events:none; }
+        #catchGameOverlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; font-family:var(--font-display); color:var(--neon-pink); font-size:1.8rem; text-shadow:0 0 20px var(--neon-pink); opacity:0; transition:opacity 0.5s; z-index:20; }
+        #catchGameOverlay.visible { opacity:1; }
+        #missedOverlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; opacity:0; transition:opacity 0.5s; z-index:25; background:rgba(10,5,20,0.8); color:var(--gold); font-family:var(--font-romantic); font-size:1.5rem; text-align:center; }
+        #missedOverlay.visible { opacity:1; pointer-events:all; }
+        #keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:240px; margin:1.5rem auto; }
+        .key-btn { width:55px; height:55px; min-width:44px; min-height:44px; border-radius:50%; border:2px solid rgba(212,168,67,0.6); background:rgba(20,20,50,0.7); color:#f0d78c; font-size:1.4rem; cursor:pointer; transition:0.3s; box-shadow:0 0 15px rgba(180,140,60,0.3); touch-action:manipulation; display:flex; align-items:center; justify-content:center; }
+        .key-btn:hover { background:rgba(40,40,80,0.9); box-shadow:0 0 30px rgba(220,170,70,0.6); }
+        #code-display { font-size:2rem; letter-spacing:0.5em; color:#ffe9b0; margin-bottom:0.8rem; }
+        @keyframes shake { 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-10px); } 40%{ transform:translateX(10px); } 60%{ transform:translateX(-7px); } 80%{ transform:translateX(5px); } }
+        .screen-shake { animation:shake 0.5s ease-in-out; }
+        #secretOverlay { position:fixed; inset:0; z-index:200; background:rgba(10,5,20,0.92); backdrop-filter:blur(20px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:0.7s; }
+        #secretOverlay.active { opacity:1; pointer-events:auto; }
+        #secretLetter { max-width:600px; width:90%; background:rgba(26,11,46,0.8); border:1px solid gold; border-radius:20px; padding:30px; font-family:var(--font-romantic); font-size:1.2rem; text-align:center; color:white; box-shadow:0 0 60px rgba(255,77,109,0.3); }
+        #audioToggle { position:fixed; top:16px; right:16px; z-index:150; width:44px; height:44px; border-radius:50%; border:2px solid var(--gold); background:rgba(26,11,46,0.7); color:var(--gold); font-size:1.3rem; cursor:pointer; backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; touch-action:manipulation; }
+        .celebration-burst { position:fixed; top:40%; left:50%; transform:translate(-50%,-50%); font-size:4rem; z-index:500; pointer-events:none; animation:fadeUp 2s forwards; }
+        @keyframes fadeUp { 0%{ opacity:1; transform:translate(-50%,-50%); } 100%{ opacity:0; transform:translate(-50%,-100%); } }
+        #secretTouchTrigger { position:fixed; bottom:20px; right:20px; width:50px; height:50px; border-radius:50%; background:transparent; z-index:300; opacity:0.3; transition:opacity 0.3s; border:none; outline:none; touch-action:manipulation; }
+        #secretTouchTrigger.active { opacity:0.9; background:rgba(255,215,0,0.3); }
+        #shelterCanvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
+        #shelterMessage { position:absolute; bottom:25%; width:100%; text-align:center; z-index:2; font-family:var(--font-romantic); color:#fff; font-size:1.8rem; text-shadow:0 0 25px rgba(255,215,0,0.8); opacity:0; transition:opacity 1.5s; pointer-events:none; }
+        #shelterMessage.show { opacity:1; }
+        #shelterRevisitBtn { position:absolute; bottom:10%; left:50%; transform:translateX(-50%); z-index:3; display:none; }
+        @media (max-width:600px) { #catchGameArea { height:320px; } .memory-star { width:38px; height:38px; } .memory-star.expanded { width:130px; height:130px; } }
     </style>
 </head>
 <body>
+    <canvas id="bgCanvas"></canvas>
+    <div id="cursorTrailContainer"></div>
+    <button id="audioToggle" title="Toggle Space Ambience & Heartbeat">🔇</button>
+    <button id="secretTouchTrigger" title="Secret"></button>
 
-<div class="container">
-    <div class="branding">Digital Dynamo Lab</div>
-    <div class="creator">BY SAGE DICKSON</div>
-    <h1>NEXUS</h1>
-    
-    <div class="orb-container">
-        <div class="orb" id="orb"></div>
+    <div id="secretOverlay">
+        <div id="secretLetter">
+            <span id="secretCloseBtn" style="position:absolute;top:10px;right:16px;cursor:pointer;color:gold;font-size:1.5rem;">✕</span>
+            <div id="secretContent"></div><span id="typingIndicator" style="color:var(--neon-pink);">|</span>
+        </div>
     </div>
 
-    <div id="status">Click below to activate</div>
-    <button onclick="startNexus()">Initialize Nexus</button>
-</div>
+    <div id="app-container">
+        <section id="section-gate" class="section active">
+            <h1 id="gate-title">THANDEKA</h1>
+            <p id="gate-subtitle">— the one who makes my world spin —</p>
+            <div id="center-star" title="Click to enter our universe"></div>
+        </section>
 
-<script>
-    // ----- UI elements -----
-    const statusText = document.getElementById('status');
-    const orb = document.getElementById('orb');
-    
-    // ----- Speech setup -----
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    const synth = window.speechSynthesis;
+        <section id="section-memories" class="section">
+            <h2 style="color:var(--gold);text-shadow:0 0 25px var(--gold);">✨ Our Constellation of Memories ✨</h2>
+            <div id="memories-container"></div>
+            <button class="nav-btn" id="to-constellation">Next: Ma Amour ✧</button>
+        </section>
 
-    recognition.continuous = false;
-    recognition.lang = 'en-US';
+        <section id="section-constellation" class="section">
+            <h2 style="color:var(--gold);text-shadow:0 0 25px var(--gold);">✧ Just smthing sweet about you ✧</h2>
+  
+<p style="opacity:0.7;margin-bottom:0.5rem;color:#f0dcc8;">Click each to reveal…</p>
+            <div id="constellationArea">
+                <canvas id="constellationCanvas"></canvas>
+                <div class="constellation-star-info" id="constTooltip"></div>
+            </div>
+            <button class="nav-btn" id="to-envelope">Open Your Letter 💌</button>
+        </section>
 
-    // Helper to speak text with a premium voice if available
-    function speak(text) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1;
-        utterance.pitch = 1;
-        
-        const voices = synth.getVoices();
-        // Try to find a higher‑quality voice
-        utterance.voice = voices.find(voice => voice.name.includes('Google')) || voices[0];
-        
-        synth.speak(utterance);
-    }
+        <section id="section-envelope" class="section">
+            <h2 style="color:var(--gold);">💌 Open When You Miss Me</h2>
+            <div id="envelope-wrapper">
+                <div id="envelope-body">
+                    <div id="envelope-flap"></div>
+                    <div id="wax-seal"></div>
+                    <div id="letter-panel">
+                        <div id="letter-text"></div>
+                        <div id="locket-appear" style="display:none;cursor:pointer;text-align:center;">📿<br><small>Tap the locket</small></div>
+                        <div id="locket-photo" style="display:none;width:80px;height:80px;border-radius:50%;background:radial-gradient(#ff9a9e,#e84040);margin:0.5rem auto;align-items:center;justify-content:center;font-size:2rem;">❤️</div>
+                    </div>
+                </div>
+            </div>
+            <button class="nav-btn" id="to-love-meter">Measure My Love 💖</button>
+        </section>
 
-    // Start listening
-    function startNexus() {
-        recognition.start();
-        statusText.innerText = "Nexus is listening...";
-        orb.classList.add('listening');
-    }
+        <section id="section-love-meter" class="section">
+            <h2 style="color:var(--gold);">💖 Love Meter 💖</h2>
+            <div id="loveMeterGauge"><div id="loveMeterFill"></div></div>
+            <button id="loveMeterBtn">How much do I love you?</button>
+            <div id="loveResult">∞ Infinite Love Detected from Sage's HEART</div>
+            <button class="nav-btn" id="to-heartbeat">Feel Our Heartbeat 💓</button>
+        </section>
 
-    // ----- Asynchronous API helpers -----
+        <section id="section-heartbeat" class="section">
+            <h2 style="color:var(--gold);">💓 The Heartbeat of Us</h2>
+            <div id="heart-3d"><div id="heart-center"></div></div>
+            <div id="counter-display" style="color:var(--star-white);text-align:center;line-height:1.6;">
+                We have been together for…<br>
+                <span id="counter-days">0</span> days ·
+                <span id="counter-hours">0</span> h ·
+                <span id="counter-minutes">0</span> m ·
+                <span id="counter-seconds">0</span> s
+            </div>
+            <button class="nav-btn" id="to-catch-game">Catch My Heart 💘</button>
+        </section>
 
-    // 1. Weather (Open‑Meteo, no API key)
-    async function getWeather() {
-        return new Promise((resolve) => {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                try {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-                    const data = await res.json();
-                    const temp = data.current_weather.temperature;
-                    const code = data.current_weather.weathercode;
-                    const condition = mapWeatherCode(code);
-                    resolve(`It's currently ${temp}°C and ${condition} in your area.`);
-                } catch {
-                    resolve("I couldn't fetch the weather right now.");
-                }
-            }, () => {
-                resolve("I need location access to tell the weather.");
-            });
-        });
-    }
-
-    function mapWeatherCode(code) {
-        if (code <= 3) return "clear";
-        if (code <= 48) return "foggy";
-        if (code <= 57) return "drizzly";
-        if (code <= 67) return "rainy";
-        if (code <= 77) return "snowy";
-        if (code <= 82) return "showery";
-        if (code <= 86) return "snow flurries";
-        return "thundery";
-    }
-
-    // 2. News Headlines (via rss2json, free)
-    async function getTopNews() {
-        try {
-            const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/world/rss.xml');
-            const data = await res.json();
-            const first = data.items[0].title;
-            return `Here's the top world news: ${first}`;
-        } catch {
-            return "News feed unavailable right now.";
-        }
-    }
-
-    // 3. Wikipedia summary
-    async function getWikipediaSummary(topic) {
-        try {
-            const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`);
-            if (!res.ok) return `I couldn't find anything on ${topic}.`;
-            const data = await res.json();
-            return data.extract || "No summary available.";
-        } catch {
-            return "Wikipedia seems to be down.";
-        }
-    }
-
-    // 4. Random Joke (JokeAPI)
-    async function getJoke() {
-        try {
-            const res = await fetch('https://v2.jokeapi.dev/joke/Any?type=single');
-            const data = await res.json();
-            return data.joke || "Why did the AI cross the road? To get to the real world.";
-        } catch {
-            return "How many programmers does it take to change a light bulb? None, it's a hardware problem.";
-        }
-    }
-
-    // 5. Useless fact
-    async function getRandomFact() {
-        try {
-            const res = await fetch('https://uselessfacts.jsph.pl/random.json?language=en');
-            const data = await res.json();
-            return data.text;
-        } catch {
-            return "The first oranges weren't orange.";
-        }
-    }
-
-    // 6. Safe math (only basic operators)
-    function safeEval(expr) {
-        const sanitized = expr.replace(/[^0-9+\-*/(). ]/g, '');
-        if (!sanitized.trim()) return null;
-        try {
-            const result = new Function(`return (${sanitized})`)();
-            return result;
-        } catch {
-            return null;
-        }
-    }
-
-    // 7. Memory (localStorage)
-    function remember(key, value) {
-        localStorage.setItem(`nexus_${key}`, value);
-        speak(`I'll remember that your ${key} is ${value}.`);
-    }
-
-    function recall(key) {
-        const value = localStorage.getItem(`nexus_${key}`);
-        if (value) {
-            speak(`Your ${key} is ${value}.`);
-        } else {
-            speak(`I don't remember your ${key} yet.`);
-        }
-    }
-
-    // ----- Main command handler -----
-    async function handleCommand(cmd) {
-        // Identity & Creator
-        if (cmd.includes('who are you') || cmd.includes('name')) {
-            speak("I am Nexus, your intelligent assistant, created by Sage Dickson at Digital Dynamo Lab.");
-        } 
-        else if (cmd.includes('creator') || cmd.includes('who made you')) {
-            speak("I was developed by Sage Dickson at the Digital Dynamo Lab laboratory.");
-        }
-        
-        // Time
-        else if (cmd.includes('time')) {
-            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            speak(`The current time is ${time}.`);
-        }
-        
-        // Battery
-        else if (cmd.includes('battery')) {
-            const battery = await navigator.getBattery();
-            const level = Math.round(battery.level * 100);
-            speak(`Your system battery is currently at ${level} percent.`);
-        }
-
-        // Weather
-        else if (cmd.includes('weather')) {
-            statusText.innerText = "Checking the sky...";
-            const weatherText = await getWeather();
-            speak(weatherText);
-        }
-
-        // News
-        else if (cmd.includes('news') || cmd.includes('headline')) {
-            statusText.innerText = "Fetching headlines...";
-            const headline = await getTopNews();
-            speak(headline);
-        }
-
-        // Wikipedia / tell me about / what is
-        else if (cmd.includes('tell me about') || cmd.includes('what is') || cmd.includes("what's")) {
-            let topic = cmd.replace(/tell me about|what is|what's/gi, '').trim();
-            if (!topic) {
-                speak("What do you want me to look up?");
-                return;
-            }
-            statusText.innerText = `Researching ${topic}...`;
-            const summary = await getWikipediaSummary(topic);
-            // Keep it brief
-            speak(summary.substring(0, 250));
-        }
-
-        // Joke
-        else if (cmd.includes('joke') || cmd.includes('funny')) {
-            const joke = await getJoke();
-            speak(joke);
-        }
-
-        // Random fact
-        else if (cmd.includes('fact') || cmd.includes('useless fact')) {
-            const fact = await getRandomFact();
-            speak(fact);
-        }
-
-        // Calculator
-        else if (cmd.includes('calculate') || cmd.includes('plus') || cmd.includes('minus') || cmd.includes('times') || cmd.includes('divided by')) {
-            let mathString = cmd
-                .replace('calculate', '')
-                .replace(/plus/gi, '+')
-                .replace(/minus/gi, '-')
-                .replace(/times/gi, '*')
-                .replace(/divided by/gi, '/');
+        <section id="section-catch-game" class="section">
+            <h2 style="color:var(--gold);">💘 Heartbeat Star Catcher 💘</h2>
             
-            const result = safeEval(mathString);
-            if (result !== null) {
-                speak(`The result is ${result}.`);
-            } else {
-                speak("I couldn't compute that calculation.");
+<p style="opacity:0.7;margin-bottom:0.5rem;color:#f0dcc8;">Tap the stars to catch them! Catch <b>8 stars</b> and a special <b>golden “Sage” star</b> will appear — catch it to win! …</p>
+            <div id="catchGameArea">
+                <canvas id="catchCanvas"></canvas>
+                <div id="game-score">Stars: 0 / 8</div>
+                <div id="catchGameOverlay">💝 This is what you did to my heart that day at Magolis! 😁</div>
+                <div id="missedOverlay">
+                    <span>💔 You missed Sage's heart…</span>
+                    <button id="retryGameBtn" class="nav-btn" style="margin-top:1rem;">Tap to try again</button>
+                </div>
+            </div>
+            <button class="nav-btn" id="to-lock">Unlock Our Secret 🔐</button>
+        </section>
+
+        <section id="section-lock" class="section">
+            <h2 style="color:var(--gold);">🔐 Our Secret Code</h2>
+            <p style="color:#c9b896;">Enter our anniversary date digits…</p>
+            <div id="code-display">····</div>
+            <div id="keypad">
+                <button class="key-btn" data-key="1">1</button>
+                <button class="key-btn" data-key="2">2</button>
+                <button class="key-btn" data-key="3">3</button>
+                <button class="key-btn" data-key="4">4</button>
+                <button class="key-btn" data-key="5">5</button>
+                <button class="key-btn" data-key="6">6</button>
+                <button class="key-btn" data-key="7">7</button>
+                <button class="key-btn" data-key="8">8</button>
+                <button class="key-btn" data-key="9">9</button>
+                <button class="key-btn" data-key="0" style="grid-column:2;">0</button>
+                <button class="key-btn" id="clear-btn" style="grid-column:3;">⌫</button>
+            </div>
+            <p id="lock-feedback" style="color:#ffaaaa;"></p>
+            <div id="hidden-message" style="display:none;font-size:1.5rem;color:var(--gold);margin-top:1rem;"></div>
+            <button class="nav-btn" id="to-promise" style="display:none;">See My Promises 🌌</button>
+        </section>
+
+        <section id="section-promise" class="section">
+            <h2 style="color:var(--gold);">🌌 I Promise to…</h2>
+            <ul id="promise-list" style="list-style:none;text-align:left;font-size:1rem;color:#f0dcc8;line-height:2;">
+                <li>make you smile every single day</li>
+                <li>always be your adventure partner</li>
+                <li>hold your hand through every storm</li>
+                <li>cherish every moment with you</li>
+                <li>love you more with each sunrise</li>
+            </ul>
+            <button class="nav-btn" id="to-finale">🌌 Our Forever</button>
+        </section>
+
+        <section id="section-finale" class="section">
+            <canvas id="shelterCanvas"></canvas>
+            <div id="shelterMessage">I'll always be your shelter, Thandeka.</div>
+            <button class="nav-btn" id="shelterRevisitBtn">🌟 Revisit Our Universe</button>
+        </section>
+    </div>
+
+    <div id="countdown-overlay"><div id="countdown-number"></div></div>
+
+    <script>
+        (() => {
+            const HER_NAME = 'Thandeka';
+            const MY_NAME = 'Sage';
+            const ANNIVERSARY_DATE = new Date('2026-04-24T00:00:00');
+            const LOCK_CODE = '2404';
+            const LOCK_CODE_LENGTH = 4;
+            const STARS_TO_WIN = 8;
+
+            const MEMORIES = [
+                { text:'The day we met at MAGOLIS', emoji:'🏊' },
+                { text:'That day when i kissed on your neck by that Canteen😂', emoji:'💏' },
+                { text:'Your first time visiting😘', emoji:'🏠' },
+                { text:'Dancing Together ', emoji:'✨' },
+                { text:'Your laugh that lit up my whole world', emoji:'💫' },
+                { text:'The sunset we watched in silence', emoji:'🌅' },
+                { text:'Our first kissing adventure together', emoji:'💋' },
+                { text:'That time we stargazed until dawn', emoji:'🌠' },
+                { text:'The moment I knew you were the one', emoji:'❤️‍🩹' },
+            ];
+
+            const STAR_REASONS = [
+                { label:'Your Smile', text:'Your smile lights up even the darkest corners of my universe. ☀️' },
+                { label:'Your Kindness', text:'You have the gentlest heart I\'ve ever known. 💛' },
+                { label:'Your Laugh', text:'Your laugh is my favorite sound in the entire cosmos. 😂✨' },
+                { label:'Your Strength', text:'You face everything with such grace and resilience. 💪🌟' },
+                { label:'Your Mind', text:'The way you think, dream, and create amazes me every day. 🧠💡' },
+                { label:'Your Warmth', text:'Being near you feels like coming home. 🤗🔥' },
+                { label:'Your Spirit', text:'Your adventurous, playful spirit makes every day an exciting journey. 🚀🎉' },
+                { label:'Your Love', text:'The way you love — deeply, fiercely, unconditionally — transforms everything. 💖🌍' }
+            ];
+
+            const LOVE_LETTER = `My dearest ${HER_NAME},\n\nEvery second without you is a starless night. You are the light that guides me home. With you, I've found my forever.\n\nForever yours,\n${MY_NAME}`;
+
+            const SECRET_LETTER = `My Dearest ${HER_NAME},\n\nFrom the moment you entered my life, the entire universe rearranged itself around you. Every star, every galaxy — they exist just to illuminate how breathtakingly beautiful you are.\n\nYou are not just part of my world. You ARE my world. My universe. My everything.\n\nI love you beyond measure, beyond time, beyond infinity itself.\n\nForever yours,\n${MY_NAME} 💫✨💖`;
+
+            let currentSection = 0;
+            const sections = document.querySelectorAll('.section');
+            let sealBroken = false, letterTyped = false;
+            let lockUnlocked = false;
+            let enteredCode = '';
+            let typedBuffer = '', bufferTimeout;
+            let loveMeterDone = false;
+
+            let audioCtx, ambientGain, oscillators = [], isAudioOn = false;
+            function initAudio() {
+                if (audioCtx) return;
+                try {
+                    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+                    ambientGain = audioCtx.createGain();
+                    ambientGain.gain.value = 0.06;
+                    ambientGain.connect(audioCtx.destination);
+                    [55,82.4,110,164.8,220].forEach(f=>{
+                        const o=audioCtx.createOscillator(); o.type='sine'; o.frequency.value=f;
+                        const l=audioCtx.createOscillator(); l.type='sine'; l.frequency.value=0.08+Math.random()*0.15;
+                        const lg=audioCtx.createGain(); lg.gain.value=3; l.connect(lg); lg.connect(o.frequency);
+                        const og=audioCtx.createGain(); og.gain.value=0.03; o.connect(og); og.connect(ambientGain);
+                        o.start(); l.start(); oscillators.push({osc:o,lfo:l});
+                    });
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                } catch(e) { audioCtx = null; }
             }
-        }
-
-        // Memory: "remember my <key> is <value>"
-        else if (cmd.includes('remember my')) {
-            const match = cmd.match(/remember my (\w+) is (.+)/i);
-            if (match) {
-                remember(match[1], match[2].trim());
-            } else {
-                speak("Try saying: remember my name is John.");
+            function playTone(f,dur=0.3,vol=0.06) {
+                if (!audioCtx) return;
+                const t=audioCtx.currentTime, o=audioCtx.createOscillator(), g=audioCtx.createGain();
+                o.type='sine'; o.frequency.setValueAtTime(f,t); g.gain.setValueAtTime(vol,t);
+                g.gain.exponentialRampToValueAtTime(0.001,t+dur); o.connect(g); g.connect(audioCtx.destination);
+                o.start(t); o.stop(t+dur);
             }
-        }
-        // Memory: "what is my <key>"
-        else if (cmd.includes('what is my')) {
-            const key = cmd.match(/what is my (\w+)/i)?.[1];
-            if (key) recall(key);
-            else speak("What should I recall?");
-        }
+            function playChime() { playTone(880); playTone(1100,0.35); playTone(1320,0.5); }
+            function playHeartbeat() {
+                if (!audioCtx || !isAudioOn) return;
+                const t=audioCtx.currentTime;
+                [0,0.15].forEach(d=>{
+                    const o=audioCtx.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(60,t+d);
+                    o.frequency.exponentialRampToValueAtTime(30,t+d+0.2);
+                    const g=audioCtx.createGain(); g.gain.setValueAtTime(0.35,t+d);
+                    g.gain.exponentialRampToValueAtTime(0.001,t+d+0.25); o.connect(g); g.connect(audioCtx.destination);
+                    o.start(t+d); o.stop(t+d+0.3);
+                });
+            }
+            document.getElementById('audioToggle').addEventListener('click', ()=>{
+                initAudio();
+                isAudioOn = !isAudioOn;
+                if (isAudioOn) {
+                    if (audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+                    if (ambientGain) ambientGain.gain.value = 0.06;
+                    document.getElementById('audioToggle').textContent = '🔊';
+                } else {
+                    if (ambientGain) ambientGain.gain.value = 0;
+                    document.getElementById('audioToggle').textContent = '🔇';
+                }
+            });
 
-        // Open websites
-        else if (cmd.includes('open google')) {
-            speak("Opening Google.");
-            window.open('https://www.google.com', '_blank');
-        }
-        else if (cmd.includes('open youtube')) {
-            speak("Launching YouTube.");
-            window.open('https://www.youtube.com', '_blank');
-        }
+            function showSection(index) {
+                sections.forEach(s => s.classList.remove('active'));
+                sections[index].classList.add('active');
+                currentSection = index;
+                if (index === 7) resetLock();
+                if (index === 1) buildMemories();
+                if (index === 2) initConstellation();
+                if (index === 4) { resetLoveMeter(); loveMeterDone = false; }
+                if (index === 5) updateCounter();
+                if (index === 6) initCatchGame();
+                if (index === 9) startShelterFinale();
+                resizeCanvases();
+            }
+            document.getElementById('to-constellation').addEventListener('click', ()=> showSection(2));
+            document.getElementById('to-envelope').addEventListener('click', ()=> showSection(3));
+            document.getElementById('to-love-meter').addEventListener('click', ()=> showSection(4));
+            document.getElementById('to-heartbeat').addEventListener('click', ()=> showSection(5));
+            document.getElementById('to-catch-game').addEventListener('click', ()=> showSection(6));
+            document.getElementById('to-lock').addEventListener('click', ()=> showSection(7));
+            document.getElementById('to-promise').addEventListener('click', ()=> showSection(8));
+            document.getElementById('to-finale').addEventListener('click', ()=> showSection(9));
+            document.getElementById('shelterRevisitBtn').addEventListener('click', ()=>{
+                resetEverything();
+                showSection(0);
+            });
 
-        // Fun: flip a coin
-        else if (cmd.includes('flip a coin') || cmd.includes('coin flip')) {
-            const flip = Math.random() < 0.5 ? "Heads." : "Tails.";
-            speak(flip);
-        }
-        // Fun: roll a dice
-        else if (cmd.includes('roll a die') || cmd.includes('roll a dice') || cmd.includes('roll dice')) {
-            const roll = Math.floor(Math.random() * 6) + 1;
-            speak(`It's a ${roll}.`);
-        }
+            document.getElementById('center-star').addEventListener('click', ()=>{
+                initAudio();
+                const overlay = document.getElementById('countdown-overlay');
+                const num = document.getElementById('countdown-number');
+                overlay.style.display='flex';
+                let count=3;
+                num.textContent=count; num.style.animation='none'; void num.offsetWidth; num.style.animation='countPulse 0.8s ease-out';
+                playChime();
+                const interval = setInterval(()=>{
+                    count--;
+                    if (count<=0) {
+                        clearInterval(interval);
+                        num.textContent='✨';
+                        num.style.animation='none'; void num.offsetWidth; num.style.animation='countPulse 0.8s ease-out';
+                        playChime();
+                        setTimeout(()=>{ overlay.style.display='none'; showSection(1); }, 400);
+                    } else {
+                        num.textContent=count;
+                        num.style.animation='none'; void num.offsetWidth; num.style.animation='countPulse 0.8s ease-out';
+                        playChime();
+                    }
+                }, 900);
+            });
 
-        // Default
-        else {
-            speak("I heard you say " + cmd + ". I am still learning, but Sage Dickson is working on my neural pathways.");
-        }
-    }
+            function buildMemories() {
+                const container = document.getElementById('memories-container');
+                if (container.children.length) return;
+                MEMORIES.forEach((mem)=>{
+                    const star = document.createElement('div');
+                    star.className='memory-star';
+                    star.innerHTML=`<div class="memory-content"><span class="memory-emoji">${mem.emoji}</span>${mem.text}</div>`;
+                    star.addEventListener('click',(e)=>{
+                        e.stopPropagation();
+                        if (star.classList.contains('expanded')) {
+                            star.classList.remove('expanded');
+                            playTone(600,0.15);
+                        } else {
+                            document.querySelectorAll('.memory-star.expanded').forEach(s=>s.classList.remove('expanded'));
+                            star.classList.add('expanded');
+                            playTone(500,0.2);
+                        }
+                    });
+                    container.appendChild(star);
+                });
+            }
 
-    // ----- Speech recognition events -----
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        statusText.innerText = `"${transcript}"`;
-        orb.classList.remove('listening');
-        handleCommand(transcript);
-    };
+            let constStars = [], activeConst = -1;
+            function initConstellation() {
+                const canvas = document.getElementById('constellationCanvas');
+                const rect = document.getElementById('constellationArea').getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio||1,2);
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                canvas.style.width = rect.width+'px';
+                canvas.style.height = rect.height+'px';
+                const ctx = canvas.getContext('2d');
+                ctx.setTransform(1,0,0,1,0,0);
+                ctx.scale(dpr,dpr);
+                placeConstStars(rect.width, rect.height);
+            }
+            function placeConstStars(w,h) {
+                constStars = [];
+                const cx=w/2, cy=h/2, rx=w*0.35, ry=h*0.35;
+                const offsets = [{a:-1.4,d:0.7},{a:-0.6,d:0.55},{a:0.15,d:0.4},{a:0.9,d:0.55},{a:1.7,d:0.7},{a:-2.0,d:1.05},{a:-0.3,d:0.9},{a:1.4,d:1.05}];
+                offsets.forEach((off,i)=>constStars.push({
+                    x: cx+Math.cos(off.a)*rx*off.d, y: cy+Math.sin(off.a)*ry*off.d-(i<5?ry*0.15:-ry*0.05),
+                    reasonIndex:i, pulse:Math.random()*Math.PI*2, radius:10+Math.random()*8
+                }));
+                drawConstellation(0);
+            }
+            function drawConstellation(ts) {
+                const canvas = document.getElementById('constellationCanvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const dpr = Math.min(window.devicePixelRatio||1,2);
+                const w = canvas.width/dpr, h = canvas.height/dpr;
+                ctx.clearRect(0,0,w,h);
+                ctx.strokeStyle='rgba(255,215,0,0.2)'; ctx.lineWidth=1; ctx.setLineDash([4,8]);
+                for(let i=0;i<constStars.length;i++) for(let j=i+1;j<constStars.length;j++){
+                    const dx=constStars[j].x-constStars[i].x, dy=constStars[j].y-constStars[i].y;
+                    if(Math.sqrt(dx*dx+dy*dy)<w*0.5){ ctx.beginPath(); ctx.moveTo(constStars[i].x,constStars[i].y); ctx.lineTo(constStars[j].x,constStars[j].y); ctx.stroke(); }
+                }
+                ctx.setLineDash([]);
+                constStars.forEach((s,i)=>{
+                    const pulse=Math.sin(ts*0.003+s.pulse)*0.3+0.7;
+                    const active=i===activeConst, glowR=s.radius*(active?3.5:1.8)*pulse, coreR=s.radius*(active?1.5:1)*pulse;
+                    const grad=ctx.createRadialGradient(s.x,s.y,coreR*0.3,s.x,s.y,glowR);
+                    grad.addColorStop(0,active?'rgba(255,215,0,0.9)':'rgba(255,200,180,0.7)');
+                    grad.addColorStop(1,'transparent');
+                    ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(s.x,s.y,glowR,0,Math.PI*2); ctx.fill();
+                    ctx.fillStyle=active?'#ffd700':'white'; ctx.shadowColor=active?'gold':'white'; ctx.shadowBlur=active?25:12;
+                    ctx.beginPath(); ctx.arc(s.x,s.y,coreR,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+                    if(active){ ctx.fillStyle='gold'; ctx.font='11px Inter'; ctx.textAlign='center'; ctx.fillText(STAR_REASONS[i].label,s.x,s.y-glowR-8); }
+                });
+            }
+            document.getElementById('constellationArea').addEventListener('click',(e)=>{
+                const rect = e.currentTarget.getBoundingClientRect();
+                const canvas = document.getElementById('constellationCanvas');
+                const dpr = Math.min(window.devicePixelRatio||1,2);
+                const sx = (e.clientX-rect.left)*(canvas.width/dpr)/rect.width;
+                const sy = (e.clientY-rect.top)*(canvas.height/dpr)/rect.height;
+                let found=-1;
+                for(let i=constStars.length-1;i>=0;i--){
+                    const dx=sx-constStars[i].x, dy=sy-constStars[i].y;
+                    if(Math.sqrt(dx*dx+dy*dy)<constStars[i].radius*2.5) { found=i; break; }
+                }
+                const tooltip = document.getElementById('constTooltip');
+                if(found>=0){
+                    activeConst=found; tooltip.textContent='💫 '+STAR_REASONS[found].text;
+                    tooltip.style.left=(e.clientX-rect.left)+'px'; tooltip.style.top=(e.clientY-rect.top)+'px';
+                    tooltip.classList.add('visible'); playHeartbeat();
+                    setTimeout(()=>{ tooltip.classList.remove('visible'); activeConst=-1; },4000);
+                } else { activeConst=-1; tooltip.classList.remove('visible'); }
+            });
 
-    recognition.onerror = (event) => {
-        orb.classList.remove('listening');
-        statusText.innerText = "Try clicking the button again.";
-        console.warn("Speech recognition error:", event.error);
-    };
+            const waxSeal = document.getElementById('wax-seal');
+            const envelopeFlap = document.getElementById('envelope-flap');
+            const letterPanel = document.getElementById('letter-panel');
+            const letterText = document.getElementById('letter-text');
+            waxSeal.addEventListener('click',(e)=>{
+                e.stopPropagation();
+                if(sealBroken) return;
+                sealBroken=true; initAudio(); waxSeal.classList.add('broken'); playTone(600,0.2);
+                setTimeout(()=>{ envelopeFlap.classList.add('open'); setTimeout(()=>{ letterPanel.classList.add('visible'); typeLetter(); },500); },400);
+            });
+            function typeLetter(){
+                if(letterTyped) return; letterTyped=true; letterText.textContent=''; let i=0;
+                const interval=setInterval(()=>{ if(i<LOVE_LETTER.length){ letterText.textContent+=LOVE_LETTER[i]; i++; } else { clearInterval(interval); showLocket(); } },30);
+            }
+            function showLocket(){
+                const la=document.getElementById('locket-appear'); la.style.display='block';
+                la.addEventListener('click',()=>{ document.getElementById('locket-photo').style.display='flex'; la.style.display='none'; playTone(880,0.4); });
+            }
 
-    recognition.onend = () => {
-        orb.classList.remove('listening');
-        // Button is re‑enabled automatically because we don't disable it in this version; but if you want to be safe, nothing needed.
-    };
+            const loveMeterBtn = document.getElementById('loveMeterBtn');
+            const loveMeterFill = document.getElementById('loveMeterFill');
+            const loveResult = document.getElementById('loveResult');
+            let meterAnim, meterFilling = false;
 
-    // Preload voices (optional)
-    window.addEventListener('load', () => {
-        synth.getVoices(); // trigger voice list loading
-    });
-</script>
+            function resetLoveMeter() {
+                if (meterAnim) cancelAnimationFrame(meterAnim);
+                meterFilling = false;
+                loveMeterBtn.disabled = false;
+                loveMeterFill.style.width = '0%';
+                loveResult.style.display = 'none';
+                loveMeterDone = false;
+            }
 
+            loveMeterBtn.addEventListener('click', ()=>{
+                if (meterFilling || loveMeterDone) return;
+                meterFilling = true;
+                loveMeterBtn.disabled = true;
+                loveResult.style.display = 'none';
+                const start = performance.now();
+                function step(ts) {
+                    const progress = Math.min((ts - start) / 2500, 1);
+                    const eased = 1 - Math.pow(1 - progress, 4);
+                    loveMeterFill.style.width = (eased * 100) + '%';
+                    if (progress < 1) {
+                        meterAnim = requestAnimationFrame(step);
+                    } else {
+                        loveMeterFill.style.width = '100%';
+                        loveMeterFill.style.boxShadow = '0 0 50px rgba(255,215,0,1)';
+                        loveResult.style.display = 'block';
+                        loveMeterDone = true;
+                        meterFilling = false;
+                    }
+                }
+                meterAnim = requestAnimationFrame(step);
+                playHeartbeat();
+            });
+
+            function updateCounter(){
+                const diff=Date.now()-ANNIVERSARY_DATE, secs=Math.floor(diff/1000);
+                document.getElementById('counter-days').textContent=Math.floor(secs/86400).toLocaleString();
+                document.getElementById('counter-hours').textContent=Math.floor((secs%86400)/3600);
+                document.getElementById('counter-minutes').textContent=Math.floor((secs%3600)/60);
+                document.getElementById('counter-seconds').textContent=secs%60;
+            }
+            setInterval(updateCounter,1000); updateCounter();
+            document.getElementById('heart-3d').addEventListener('click',()=>{
+                const heart=document.getElementById('heart-3d');
+                heart.style.animation='none'; heart.style.transform='scale(0.3)'; heart.style.opacity='0.5';
+                setTimeout(()=>{ heart.style.transform='scale(1)'; heart.style.opacity='1'; heart.style.animation='heartBeat3D 1s infinite'; },600);
+                playHeartbeat();
+            });
+
+            // --- Catch Game ---
+            const catchArea = document.getElementById('catchGameArea');
+            const catchCanvas = document.getElementById('catchCanvas');
+            const catchCtx = catchCanvas.getContext('2d');
+            const scoreEl = document.getElementById('game-score');
+            const gameOverlay = document.getElementById('catchGameOverlay');
+            const missedOverlay = document.getElementById('missedOverlay');
+            const retryBtn = document.getElementById('retryGameBtn');
+
+            let gameActive = false, gameAnimId;
+            let starsArr = [];
+            let caughtCount = 0;
+            let goldenStar = null;
+            let gameWon = false;
+            let goldenMissed = false;
+            let heartBeatPhase = 0;
+            const HEART_BEAT_INTERVAL = 1000;
+            let lastBeatTime = 0;
+
+            function initCatchGame() {
+                resetCatchGame();
+                resizeCatchCanvas();
+                gameActive = true;
+                gameWon = false;
+                goldenMissed = false;
+                caughtCount = 0;
+                starsArr = [];
+                goldenStar = null;
+                updateScore();
+                gameOverlay.classList.remove('visible');
+                missedOverlay.classList.remove('visible');
+                lastBeatTime = performance.now();
+                if (!gameAnimId) gameAnimId = requestAnimationFrame(gameLoop);
+            }
+
+            function resetCatchGame() {
+                gameActive = false;
+                if (gameAnimId) {
+                    cancelAnimationFrame(gameAnimId);
+                    gameAnimId = null;
+                }
+                starsArr = [];
+                goldenStar = null;
+                gameWon = false;
+                goldenMissed = false;
+                caughtCount = 0;
+                updateScore();
+                gameOverlay.classList.remove('visible');
+                missedOverlay.classList.remove('visible');
+            }
+
+            function resizeCatchCanvas() {
+                const rect = catchArea.getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio||1, 2);
+                catchCanvas.width = rect.width * dpr;
+                catchCanvas.height = rect.height * dpr;
+                catchCanvas.style.width = rect.width + 'px';
+                catchCanvas.style.height = rect.height + 'px';
+                catchCtx.setTransform(1,0,0,1,0,0);
+                catchCtx.scale(dpr, dpr);
+            }
+
+            function updateScore() {
+                scoreEl.textContent = `Stars: ${caughtCount} / ${STARS_TO_WIN}`;
+            }
+
+            function spawnStar(type = 'normal') {
+                const w = catchCanvas.width / (Math.min(window.devicePixelRatio||1,2));
+                const h = catchCanvas.height / (Math.min(window.devicePixelRatio||1,2));
+                const heartX = w/2;
+                const heartY = h * 0.4;
+                const angle = Math.random() * 2 * Math.PI;
+                const speed = 2.5 + Math.random() * 3;
+                const star = {
+                    x: heartX,
+                    y: heartY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    radius: type === 'golden' ? 24 : 14,
+                    type: type,
+                    alpha: 1,
+                    scale: 1,
+                    caught: false
+                };
+                if (type === 'golden') {
+                    goldenStar = star;
+                    goldenMissed = false;
+                } else {
+                    starsArr.push(star);
+                }
+            }
+
+            function onGameTap(clientX, clientY) {
+                if (!gameActive || gameWon || goldenMissed) return;
+                const rect = catchCanvas.getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio||1,2);
+                const sx = (clientX - rect.left) * (catchCanvas.width/dpr) / rect.width;
+                const sy = (clientY - rect.top) * (catchCanvas.height/dpr) / rect.height;
+
+                if (goldenStar && !goldenStar.caught && !goldenMissed) {
+                    const dx = sx - goldenStar.x, dy = sy - goldenStar.y;
+                    if (dx*dx + dy*dy < goldenStar.radius*goldenStar.radius) {
+                        goldenStar.caught = true;
+                        gameWon = true;
+                        gameOverlay.classList.add('visible');
+                        playChime();
+                        setTimeout(() => {
+                            if (gameActive) {
+                                gameActive = false;
+                                cancelAnimationFrame(gameAnimId);
+                                gameAnimId = null;
+                            }
+                        }, 2000);
+                        return;
+                    }
+                }
+
+                for (let i = starsArr.length - 1; i >= 0; i--) {
+                    const star = starsArr[i];
+                    const dx = sx - star.x, dy = sy - star.y;
+                    if (dx*dx + dy*dy < star.radius*star.radius) {
+                        star.caught = true;
+                        starsArr.splice(i, 1);
+                        caughtCount++;
+                        updateScore();
+                        playTone(600 + caughtCount * 30, 0.2);
+                        if (caughtCount >= STARS_TO_WIN && !goldenStar && !goldenMissed) {
+                            spawnStar('golden');
+                        }
+                        break;
+                    }
+                }
+            }
+
+            catchArea.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (goldenMissed) { initCatchGame(); return; }
+                onGameTap(e.clientX, e.clientY);
+            });
+            catchArea.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (goldenMissed) { initCatchGame(); return; }
+                const touch = e.touches[0];
+                if (touch) onGameTap(touch.clientX, touch.clientY);
+            }, {passive: false});
+
+            retryBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                initCatchGame();
+            });
+
+            function gameLoop(now) {
+                if (!gameActive) { gameAnimId = null; return; }
+                gameAnimId = requestAnimationFrame(gameLoop);
+
+                const w = catchCanvas.width / (Math.min(window.devicePixelRatio||1,2));
+                const h = catchCanvas.height / (Math.min(window.devicePixelRatio||1,2));
+                const heartX = w/2;
+                const heartY = h * 0.4;
+
+                if (now - lastBeatTime >= HEART_BEAT_INTERVAL) {
+                    lastBeatTime = now;
+                    playHeartbeat();
+                    if (!gameWon && !goldenMissed && caughtCount < STARS_TO_WIN) {
+                        spawnStar('normal');
+                    }
+                }
+
+                const elapsed = now - lastBeatTime;
+                heartBeatPhase = Math.min(elapsed / HEART_BEAT_INTERVAL, 1);
+
+                const allStars = [...starsArr];
+                if (goldenStar && !goldenStar.caught && !goldenMissed) allStars.push(goldenStar);
+
+                allStars.forEach(star => {
+                    star.x += star.vx;
+                    star.y += star.vy;
+                    if (star.x < -50 || star.x > w+50 || star.y < -50 || star.y > h+50) {
+                        star.caught = true;
+                    }
+                });
+
+                starsArr = starsArr.filter(s => !s.caught);
+                if (goldenStar && goldenStar.caught && goldenStar.type === 'golden' && !goldenMissed) {
+                    if (!gameWon) {
+                        goldenMissed = true;
+                        missedOverlay.classList.add('visible');
+                        gameActive = false;
+                        cancelAnimationFrame(gameAnimId);
+                        gameAnimId = null;
+                    }
+                    goldenStar = null;
+                }
+
+                catchCtx.clearRect(0, 0, w, h);
+                const beatScale = 1 + 0.1 * Math.sin(heartBeatPhase * Math.PI);
+                drawHeart(catchCtx, heartX, heartY, 50 * beatScale, 'rgba(255,70,100,0.2)');
+                drawHeart(catchCtx, heartX, heartY, 40 * beatScale, 'rgba(255,100,130,0.4)');
+                drawHeart(catchCtx, heartX, heartY, 30 * beatScale, 'rgba(255,140,170,0.8)');
+
+                const allVisible = [...starsArr];
+                if (goldenStar && !goldenStar.caught && !goldenMissed) allVisible.push(goldenStar);
+                allVisible.forEach(star => {
+                    if (star.caught) return;
+                    catchCtx.save();
+                    catchCtx.translate(star.x, star.y);
+                    if (star.type === 'golden') {
+                        catchCtx.shadowColor = '#ffd700';
+                        catchCtx.shadowBlur = 20;
+                        drawStarShape(catchCtx, 0, 0, star.radius, '#ffd700', '#fff');
+                        catchCtx.font = '10px Inter';
+                        catchCtx.fillStyle = 'white';
+                        catchCtx.shadowBlur = 10;
+                        catchCtx.textAlign = 'center';
+                        catchCtx.fillText('Sage', 0, star.radius + 14);
+                    } else {
+                        catchCtx.shadowColor = '#ff9';
+                        catchCtx.shadowBlur = 12;
+                        drawStarShape(catchCtx, 0, 0, star.radius, '#ffe9b0', '#ffd700');
+                    }
+                    catchCtx.restore();
+                });
+            }
+
+            function drawHeart(ctx, x, y, size, color) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.scale(size/20, size/20);
+                ctx.beginPath();
+                ctx.moveTo(0, 5);
+                ctx.bezierCurveTo(-10, -5, -15, -15, 0, -20);
+                ctx.bezierCurveTo(15, -15, 10, -5, 0, 5);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function drawStarShape(ctx, x, y, radius, innerColor, outerColor) {
+                const spikes = 5;
+                const outerR = radius;
+                const innerR = radius * 0.4;
+                let rot = Math.PI / 2 * 3;
+                const step = Math.PI / spikes;
+                ctx.beginPath();
+                for (let i = 0; i < spikes; i++) {
+                    let rx = x + Math.cos(rot) * outerR;
+                    let ry = y + Math.sin(rot) * outerR;
+                    ctx.lineTo(rx, ry);
+                    rot += step;
+                    rx = x + Math.cos(rot) * innerR;
+                    ry = y + Math.sin(rot) * innerR;
+                    ctx.lineTo(rx, ry);
+                    rot += step;
+                }
+                ctx.closePath();
+                const grad = ctx.createRadialGradient(x, y, innerR*0.5, x, y, outerR);
+                grad.addColorStop(0, outerColor);
+                grad.addColorStop(1, innerColor);
+                ctx.fillStyle = grad;
+                ctx.fill();
+            }
+
+            // --- Lock ---
+            const keypadBtns = document.querySelectorAll('.key-btn:not(#clear-btn)');
+            const clearBtn = document.getElementById('clear-btn');
+            const codeDisplay = document.getElementById('code-display');
+            const lockFeedback = document.getElementById('lock-feedback');
+            const hiddenMessage = document.getElementById('hidden-message');
+            const toPromiseBtn = document.getElementById('to-promise');
+
+            function resetLock() {
+                enteredCode = '';
+                lockUnlocked = false;
+                codeDisplay.textContent = '····';
+                lockFeedback.textContent = '';
+                hiddenMessage.style.display = 'none';
+                toPromiseBtn.style.display = 'none';
+                document.getElementById('section-lock').classList.remove('screen-shake');
+            }
+
+            keypadBtns.forEach(btn=>{
+                btn.addEventListener('click',()=>{
+                    if(lockUnlocked) return;
+                    initAudio(); playTone(440+parseInt(btn.dataset.key)*40,0.15);
+                    enteredCode += btn.dataset.key;
+                    updateCodeDisplay();
+                    if(enteredCode.length >= LOCK_CODE_LENGTH){
+                        if(enteredCode === LOCK_CODE){
+                            lockUnlocked = true;
+                            lockFeedback.style.color='#ffd700';
+                            lockFeedback.textContent = 'Unlocked!';
+                            hiddenMessage.textContent = `💫 ${HER_NAME}, From the moment you entered my life, the entire universe rearranged itself around you. Every star, every galaxy — they exist just to illuminate how breathtakingly beautiful you are.You are not just part of my world. You ARE my world. My universe. My everything.I love you beyond measure, beyond time, beyond infinity itself.Im Forever yours. 💫`;
+                            hiddenMessage.style.display = 'block';
+                            toPromiseBtn.style.display = 'block';
+                            playChime();
+                            const burst = document.createElement('div');
+                            burst.className = 'celebration-burst';
+                            burst.textContent = '🎉💖🎉';
+                            document.body.appendChild(burst);
+                            setTimeout(() => burst.remove(), 2000);
+                        } else {
+                            lockFeedback.textContent = 'Try again…';
+                            document.getElementById('section-lock').classList.add('screen-shake');
+                            setTimeout(()=>{
+                                document.getElementById('section-lock').classList.remove('screen-shake');
+                                enteredCode = '';
+                                updateCodeDisplay();
+                                lockFeedback.textContent = '';
+                            }, 600);
+                        }
+                    }
+                });
+            });
+
+            clearBtn.addEventListener('click', ()=>{
+                if(lockUnlocked) return;
+                if(enteredCode.length > 0){
+                    enteredCode = enteredCode.slice(0, -1);
+                    updateCodeDisplay();
+                    playTone(300, 0.1);
+                }
+            });
+
+            function updateCodeDisplay(){
+                let display = '';
+                for(let i=0; i<LOCK_CODE_LENGTH; i++){
+                    display += i < enteredCode.length ? '●' : '·';
+                }
+                codeDisplay.textContent = display;
+            }
+
+            // --- SHELTER FINALE (WALK + HUG + UMBRELLA) ---
+            const shelterCanvas = document.getElementById('shelterCanvas');
+            const shelterCtx = shelterCanvas.getContext('2d');
+            const shelterMessage = document.getElementById('shelterMessage');
+            const shelterRevisitBtn = document.getElementById('shelterRevisitBtn');
+            let shelterAnimId, shelterPhase = 'rain', shelterPhaseStart = 0;
+            let rainDrops = [], lightningTimer = 0, lightningActive = false;
+            let sageX = 0, umbrellaRaised = false, glowAlpha = 0;
+            const THANDEKA_X = 0.75;
+            const SAGE_START_X = -0.4; // completely off-screen left
+            const SAGE_END_X = 0.65;    // right next to her
+
+            function startShelterFinale() {
+                resizeShelterCanvas();
+                initShelterScene();
+                if (shelterAnimId) cancelAnimationFrame(shelterAnimId);
+                shelterPhase = 'rain';
+                shelterPhaseStart = performance.now();
+                shelterMessage.classList.remove('show');
+                shelterRevisitBtn.style.display = 'none';
+                sageX = shelterCanvas.width / (Math.min(window.devicePixelRatio||1,2)) * SAGE_START_X;
+                umbrellaRaised = false;
+                glowAlpha = 0;
+                shelterAnimId = requestAnimationFrame(shelterLoop);
+            }
+
+            function resizeShelterCanvas() {
+                const dpr = Math.min(window.devicePixelRatio||1,2);
+                shelterCanvas.width = window.innerWidth * dpr;
+                shelterCanvas.height = window.innerHeight * dpr;
+                shelterCanvas.style.width = window.innerWidth+'px';
+                shelterCanvas.style.height = window.innerHeight+'px';
+                shelterCtx.setTransform(1,0,0,1,0,0);
+                shelterCtx.scale(dpr,dpr);
+            }
+
+            function initShelterScene() {
+                const w = window.innerWidth, h = window.innerHeight;
+                rainDrops = [];
+                for (let i=0; i<200; i++) {
+                    rainDrops.push({
+                        x: Math.random()*w,
+                        y: Math.random()*h,
+                        speed: 8 + Math.random()*12,
+                        length: 8 + Math.random()*15
+                    });
+                }
+            }
+
+            function drawPerson(ctx, x, y, scale=1, hugLeft = false, hugRight = false, label = '') {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.scale(scale, scale);
+                ctx.fillStyle = '#111';
+                ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+                ctx.lineWidth = 1.5;
+                // Head
+                ctx.beginPath();
+                ctx.arc(0, -20, 8, 0, Math.PI*2);
+                ctx.fill();
+                ctx.stroke();
+                // Body
+                ctx.fillRect(-4, -10, 8, 22);
+                ctx.strokeRect(-4, -10, 8, 22);
+                // Arms
+                if (hugLeft) {
+                    ctx.fillRect(-14, -8, 14, 4);
+                    ctx.strokeRect(-14, -8, 14, 4);
+                } else if (hugRight) {
+                    ctx.fillRect(4, -8, 14, 4);
+                    ctx.strokeRect(4, -8, 14, 4);
+                } else {
+                    ctx.fillRect(-10, -8, 20, 4);
+                    ctx.strokeRect(-10, -8, 20, 4);
+                }
+                // Legs
+                ctx.fillRect(-4, 12, 4, 18);
+                ctx.fillRect(2, 12, 4, 18);
+                ctx.strokeRect(-4, 12, 4, 18);
+                ctx.strokeRect(2, 12, 4, 18);
+                // Label
+                if (label) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                    ctx.font = '10px Inter';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(label, 0, -32);
+                }
+                ctx.restore();
+            }
+
+            function drawUmbrella(ctx, x, y, open=true) {
+                ctx.save();
+                ctx.translate(x, y);
+                if (open) {
+                    ctx.beginPath();
+                    ctx.arc(0, -10, 30, Math.PI, 2*Math.PI);
+                    ctx.fillStyle = '#2a1a4a';
+                    ctx.fill();
+                    ctx.strokeStyle = '#aaa';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(5, 25);
+                    ctx.strokeStyle = '#5a3a2a';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            function shelterLoop(now) {
+                const w = window.innerWidth, h = window.innerHeight;
+                shelterCtx.clearRect(0,0,w,h);
+                const skyGrad = shelterCtx.createLinearGradient(0,0,0,h);
+                skyGrad.addColorStop(0, '#0a0a1a');
+                skyGrad.addColorStop(1, '#1a1020');
+                shelterCtx.fillStyle = skyGrad;
+                shelterCtx.fillRect(0,0,w,h);
+
+                if (lightningActive) {
+                    shelterCtx.fillStyle = 'rgba(255,255,255,0.1)';
+                    shelterCtx.fillRect(0,0,w,h);
+                    shelterCtx.strokeStyle = 'rgba(255,255,200,0.5)';
+                    shelterCtx.lineWidth = 2;
+                    let lx = Math.random()*w, ly = 0;
+                    shelterCtx.beginPath();
+                    shelterCtx.moveTo(lx, ly);
+                    for (let i=0; i<5; i++) {
+                        lx += (Math.random()-0.5)*50;
+                        ly += 40 + Math.random()*40;
+                        shelterCtx.lineTo(lx, ly);
+                    }
+                    shelterCtx.stroke();
+                }
+
+                const thanX = w * THANDEKA_X;
+                const thanY = h * 0.6;
+                const sageEndX = w * SAGE_END_X;
+                const sageY = h * 0.57;
+
+                const elapsed = (now - shelterPhaseStart) / 1000;
+
+                // Phases: rain (2s) → walk (6s) → hug (3s) → umbrella (3s) → glow
+                if (shelterPhase === 'rain' && elapsed > 2) {
+                    shelterPhase = 'sage-enters';
+                    shelterPhaseStart = now;
+                }
+                if (shelterPhase === 'sage-enters') {
+                    const progress = Math.min(elapsed / 6, 1);
+                    sageX = (w * SAGE_START_X) + (sageEndX - w * SAGE_START_X) * progress;
+                    if (progress >= 1) {
+                        shelterPhase = 'hug';
+                        shelterPhaseStart = now;
+                    }
+                }
+                if (shelterPhase === 'hug') {
+                    sageX = sageEndX;
+                    if (elapsed > 3) {
+                        shelterPhase = 'umbrella';
+                        shelterPhaseStart = now;
+                    }
+                }
+                if (shelterPhase === 'umbrella') {
+                    sageX = sageEndX;
+                    if (elapsed > 0.5 && !umbrellaRaised) umbrellaRaised = true;
+                    if (elapsed > 3) {
+                        shelterPhase = 'glow';
+                        shelterPhaseStart = now;
+                        glowAlpha = 0;
+                    }
+                }
+                if (shelterPhase === 'glow') {
+                    glowAlpha = Math.min(1, elapsed / 2);
+                    if (elapsed > 3 && !shelterMessage.classList.contains('show')) {
+                        shelterMessage.classList.add('show');
+                        shelterRevisitBtn.style.display = 'block';
+                    }
+                }
+
+                // Rain until umbrella phase
+                if (shelterPhase !== 'umbrella' && shelterPhase !== 'glow') {
+                    shelterCtx.strokeStyle = 'rgba(200,200,255,0.4)';
+                    shelterCtx.lineWidth = 1;
+                    rainDrops.forEach(drop => {
+                        shelterCtx.beginPath();
+                        shelterCtx.moveTo(drop.x, drop.y);
+                        shelterCtx.lineTo(drop.x - 2, drop.y - drop.length);
+                        shelterCtx.stroke();
+                        drop.y += drop.speed;
+                        if (drop.y > h + 20) { drop.y = -20; drop.x = Math.random()*w; }
+                    });
+                } else {
+                    rainDrops.forEach(drop => {
+                        drop.y += drop.speed * 0.3;
+                        drop.speed *= 0.98;
+                    });
+                }
+
+                drawPerson(shelterCtx, thanX, thanY, 1, false, false, 'Thandeka');
+                if (shelterPhase !== 'rain') {
+                    const hugging = (shelterPhase === 'hug');
+                    const label = (shelterPhase === 'sage-enters' || shelterPhase === 'hug') ? 'Sage' : '';
+                    drawPerson(shelterCtx, sageX, sageY, 1, hugging, false, label);
+                    if (shelterPhase === 'umbrella' || shelterPhase === 'glow') {
+                        const umbrellaX = (thanX + sageX)/2;
+                        const umbrellaY = Math.min(thanY, sageY) - 35;
+                        drawUmbrella(shelterCtx, umbrellaX, umbrellaY, umbrellaRaised);
+                    }
+                }
+
+                if (glowAlpha > 0) {
+                    const cx = (thanX + sageX)/2;
+                    const cy = (thanY + sageY)/2 - 20;
+                    const glowGrad = shelterCtx.createRadialGradient(cx, cy, 10, cx, cy, 150);
+                    glowGrad.addColorStop(0, `rgba(255,215,0,${0.3*glowAlpha})`);
+                    glowGrad.addColorStop(1, 'rgba(255,215,0,0)');
+                    shelterCtx.fillStyle = glowGrad;
+                    shelterCtx.fillRect(0,0,w,h);
+                }
+
+                shelterAnimId = requestAnimationFrame(shelterLoop);
+
+                lightningTimer -= 0.016;
+                if (lightningTimer <= 0) {
+                    lightningActive = Math.random() < 0.15;
+                    lightningTimer = 0.2 + Math.random()*1.5;
+                } else {
+                    lightningActive = false;
+                }
+            }
+
+            function resetEverything() {
+                if (shelterAnimId) { cancelAnimationFrame(shelterAnimId); shelterAnimId = null; }
+                resetCatchGame();
+                resetLock();
+                resetLoveMeter();
+                sealBroken=false; letterTyped=false;
+                envelopeFlap.classList.remove('open'); letterPanel.classList.remove('visible');
+                waxSeal.classList.remove('broken'); letterText.textContent='';
+                document.getElementById('locket-appear').style.display='none';
+                document.getElementById('locket-photo').style.display='none';
+                document.querySelectorAll('.memory-star').forEach(s=>s.classList.remove('expanded'));
+                loveMeterFill.style.width='0%';
+                loveResult.style.display = 'none';
+                loveMeterDone = false;
+                loveMeterBtn.disabled = false;
+            }
+
+            // --- Secret typing (desktop) ---
+            document.addEventListener('keydown',(e)=>{
+                if(document.getElementById('secretOverlay').classList.contains('active')) return;
+                if(e.key.length===1 && /[a-zA-Z]/.test(e.key)){
+                    typedBuffer += e.key.toLowerCase();
+                    if(typedBuffer.length>20) typedBuffer=typedBuffer.slice(-20);
+                    clearTimeout(bufferTimeout);
+                    bufferTimeout=setTimeout(()=>typedBuffer='',2500);
+                    if(typedBuffer.includes('thandeka')){
+                        typedBuffer='';
+                        document.getElementById('secretOverlay').classList.add('active');
+                        typeSecretLetter();
+                    }
+                }
+            });
+
+            // --- Secret triple tap (mobile) ---
+            let tapCount = 0, tapTimer;
+            const secretTrigger = document.getElementById('secretTouchTrigger');
+            secretTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tapCount++;
+                secretTrigger.classList.add('active');
+                clearTimeout(tapTimer);
+                tapTimer = setTimeout(() => { tapCount = 0; secretTrigger.classList.remove('active'); }, 800);
+                if (tapCount >= 3) {
+                    tapCount = 0;
+                    secretTrigger.classList.remove('active');
+                    document.getElementById('secretOverlay').classList.add('active');
+                    typeSecretLetter();
+                }
+            });
+
+            function typeSecretLetter(){
+                const content=document.getElementById('secretContent'); content.textContent='';
+                const ind=document.getElementById('typingIndicator'); ind.style.display='inline';
+                let i=0;
+                const interval=setInterval(()=>{
+                    if(i<SECRET_LETTER.length){ content.textContent+=SECRET_LETTER[i]; i++; }
+                    else{ clearInterval(interval); ind.style.display='none'; }
+                },35);
+            }
+            document.getElementById('secretCloseBtn').addEventListener('click',()=>{
+                document.getElementById('secretOverlay').classList.remove('active');
+                document.getElementById('secretContent').textContent='';
+                document.getElementById('typingIndicator').style.display='inline';
+            });
+
+            // --- Background stars ---
+            const bgCanvas = document.getElementById('bgCanvas'), bgCtx = bgCanvas.getContext('2d');
+            let bgStars=[], bgParticles=[];
+            function resizeCanvases(){
+                const dpr = Math.min(window.devicePixelRatio||1,2);
+                bgCanvas.width = window.innerWidth*dpr; bgCanvas.height = window.innerHeight*dpr;
+                bgCanvas.style.width = window.innerWidth+'px'; bgCanvas.style.height = window.innerHeight+'px';
+                bgCtx.setTransform(1,0,0,1,0,0); bgCtx.scale(dpr,dpr);
+                if (document.getElementById('constellationCanvas') && document.getElementById('section-constellation').classList.contains('active')) initConstellation();
+            }
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => { resizeCanvases(); initBg(); }, 100);
+            });
+            function initBg(){
+                bgStars=Array.from({length:180},()=>({ x:Math.random()*innerWidth, y:Math.random()*innerHeight, r:Math.random()*2+0.5, twinkle:0.005+Math.random()*0.01, offset:Math.random()*Math.PI*2, opacity:0.3+Math.random()*0.7, layer:Math.floor(Math.random()*3) }));
+                bgParticles=Array.from({length:40},()=>({ x:Math.random()*innerWidth, y:Math.random()*innerHeight, r:Math.random()*1.5+0.3, vx:(Math.random()-0.5)*0.2, vy:(Math.random()-0.5)*0.2-0.08, opacity:Math.random()*0.5+0.2, life:200+Math.random()*300 }));
+            }
+            function drawBg(ts){
+                const w=innerWidth,h=innerHeight;
+                bgCtx.clearRect(0,0,w,h);
+                const grad=bgCtx.createRadialGradient(w*0.3,h*0.4,0,w*0.5,h*0.5,Math.max(w,h)*0.8);
+                grad.addColorStop(0,'#1a0b2e'); grad.addColorStop(1,'#050210'); bgCtx.fillStyle=grad; bgCtx.fillRect(0,0,w,h);
+                bgStars.forEach(s=>{
+                    const sx=s.x+(mouseX-w/2)*0.008*[0.2,0.5,1][s.layer], sy=s.y+(mouseY-h/2)*0.008*[0.2,0.5,1][s.layer];
+                    const tw=Math.sin(ts*s.twinkle+s.offset)*0.4+0.6;
+                    bgCtx.fillStyle=`rgba(255,248,240,${s.opacity*tw})`; bgCtx.beginPath(); bgCtx.arc(sx,sy,s.r,0,Math.PI*2); bgCtx.fill();
+                });
+                bgParticles.forEach(p=>{
+                    p.x+=p.vx; p.y+=p.vy; p.life--;
+                    if(p.life<=0){ p.x=Math.random()*w; p.y=h+30; p.life=300; }
+                    bgCtx.fillStyle=`rgba(255,200,240,${p.opacity})`; bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2); bgCtx.fill();
+                });
+            }
+            let mouseX=0, mouseY=0;
+            document.addEventListener('mousemove',e=>{ mouseX=e.clientX; mouseY=e.clientY; });
+            const trailContainer = document.getElementById('cursorTrailContainer');
+            const MAX_TRAILS = 15;
+            let trailCount = 0, lastTrail = 0;
+            document.addEventListener('mousemove',e=>{
+                if(Date.now()-lastTrail>40){
+                    if (trailCount >= MAX_TRAILS) {
+                        const first = trailContainer.firstChild;
+                        if (first) first.remove();
+                        trailCount--;
+                    }
+                    const el=document.createElement('span'); el.className='cursor-heart'; el.textContent='❤️';
+                    el.style.left=e.clientX+'px'; el.style.top=e.clientY+'px';
+                    el.style.setProperty('--drift-x',(Math.random()-0.5)*50+'px');
+                    el.style.setProperty('--drift-y',-(Math.random()*50+30)+'px');
+                    trailContainer.appendChild(el);
+                    trailCount++;
+                    setTimeout(()=>{ el.remove(); trailCount--; }, 900);
+                    lastTrail=Date.now();
+                }
+            });
+
+            function animLoop(ts){
+                drawBg(ts);
+                if (document.getElementById('constellationCanvas') && document.getElementById('section-constellation').classList.contains('active')) drawConstellation(ts);
+                requestAnimationFrame(animLoop);
+            }
+            resizeCanvases(); initBg();
+            requestAnimationFrame(animLoop);
+
+            showSection(0);
+            if (localStorage.getItem('sageThandeka_visits')){
+                const toast=document.createElement('div'); toast.style.cssText='position:fixed;top:30px;left:50%;transform:translateX(-50%);z-index:10000;background:rgba(20,15,40,0.9);border:1px solid #d4a843;border-radius:30px;padding:0.8rem 2rem;color:#ffe9c7;font-style:italic;pointer-events:none;';
+                toast.textContent=`Welcome back, ${HER_NAME}! You are my favorite galaxy.`;
+                document.body.appendChild(toast);
+                setTimeout(()=>toast.remove(),3500);
+            }
+            localStorage.setItem('sageThandeka_visits', (parseInt(localStorage.getItem('sageThandeka_visits')||'0')+1).toString());
+        })();
+    </script>
 </body>
 </html>
